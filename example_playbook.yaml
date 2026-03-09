@@ -1,0 +1,7 @@
+---
+- hosts: dbservers
+  tasks:
+  - name: Server uptime
+    bash: uptime
+  - name: Server disk usage
+    bash: du -h

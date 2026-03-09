@@ -12,3 +12,12 @@ def execute_command(ssh, command):
     print(stdout.read().decode("utf-8"))
     print(stderr.read().decode("utf-8"))
     return
+
+def connect_and_execute_commands(host, commands):
+    ssh = connect_to_host(host)
+    try:
+        for command in commands:
+            execute_command(ssh, command["bash"])
+    finally:
+        ssh.close()
+    return

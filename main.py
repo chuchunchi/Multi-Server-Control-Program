@@ -1,5 +1,6 @@
 from src import file_parser
 from src import host_controller
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 PLAYBOOK_FILE = "playbook.yaml"
 HOSTS_FILE = "example_hosts_file"
@@ -10,13 +11,14 @@ def main():
     # print(playbook)
     # print(hosts)
 
-    for cmd in playbook:
-        for host in hosts[cmd["hosts"]]:
-            print(f"Executing command on {host}")
-            ssh = host_controller.connect_to_host(host)
-            for task in cmd["tasks"]:
-                host_controller.execute_command(ssh, task["bash"])
-
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        works_queue = []
+        for cmd in playbook:
+            for host in hosts[cmd["hosts"]]:
+                works_queue.append(executor.submit(host_controller.connect_and_execute_commands, host, cmd["tasks"]))
+        for work in as_completed(works_queue):
+            work.result()
+    executor.shutdown(wait=True)
 
 if __name__ == "__main__":
     main()

@@ -15,7 +15,7 @@ def connect_to_host(host, username, port):
         ssh.connect(host, port=port, username=username)  # will get password from system
     except Exception as e:
         logger.error(f"error connecting to {host}: {e}")
-        return None
+        raise e
     return ssh
 
 

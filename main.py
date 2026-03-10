@@ -20,8 +20,12 @@ def click_main(playbook, hosts, username, port):
         username = config_dict.get("username")
     if port is None:
         port = config_dict.get("port", 22)
-    playbook = file_parser.parse_playbook(playbook)
-    hosts = file_parser.parse_hosts(hosts)
+    try:
+        playbook = file_parser.parse_playbook(playbook)
+        hosts = file_parser.parse_hosts(hosts)
+    except Exception as e:
+        logger.error(f"error parsing playbook or hosts: {e}")
+        return
 
     with ThreadPoolExecutor(max_workers=10) as executor:
         works_queue = []

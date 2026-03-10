@@ -3,7 +3,7 @@
 ## Task
 This is a command and control program that allows us to run tasks on multiple servers. The program is able to run a simple yaml format playbook (e.g., `playbook.yaml`) with the hosts group config in hosts file (`/etc/playbook/hosts`).
 
-## Prerequest
+## Prerequisite
 - Please run in Linus/MacOS.
 - For every hosts in hosts file, you should make sure the host is inside `~/.ssh/known_hosts`. use `ssh-keygen` to generate the key pair in your current machine, and copy your public key to that host.
 
@@ -25,11 +25,21 @@ This is a command and control program that allows us to run tasks on multiple se
     poetry run python main.py --playbook path_to_playbook --hosts path_to_hosts_file --username ssh_username --port ssh_port
     ```
 
+3. Run Tests
+    ```
+    poetry run pytest
+    ```
+
+4. Pre-commit installation (during development)
+    ```
+    pre-commit install
+    pre-commit run --all-files
+    ```
 
 ## Highlight of the Project
 ### Security Highlight
 1. We don't save or transfer the ssh key in the program, instead we load it in ~/.ssh/id_rsa
 2. We only allow known hosts to connect, avoid men in the middle attack.
 
-### Other
+### Others
 1. We use threads pool to allow concurrent execution, making the program more efficient.

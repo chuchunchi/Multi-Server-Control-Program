@@ -7,8 +7,9 @@ logger = logging.getLogger(__name__)
 
 def connect_to_host(host, username, port):
     ssh = paramiko.SSHClient()
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy()) # TODO: check this for security later
-    logger.info(f"Connect to {host} with username {username}, port {port}")
+    ssh.load_system_host_keys()
+    ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
+    logger.info(f"Try to connect to {host} with username {username}, port {port}")
     try:
         ssh.connect(host, port=port, username=username) # will get password from system
     except Exception as e:

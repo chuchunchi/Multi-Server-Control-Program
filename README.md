@@ -43,3 +43,4 @@ This is a command and control program that allows us to run tasks on multiple se
 
 ### Others
 1. We use threads pool to allow concurrent execution, making the program more efficient.
+2. We use poetry to manage python packages, use pre-commit to point out potential issue in code (upon every commit).

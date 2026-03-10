@@ -3,6 +3,10 @@ from src import host_controller
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import click
 from src.config import config_dict
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @click.command()
 @click.option("--playbook", type=click.Path(exists=True), default="playbook.yaml")
@@ -11,9 +15,9 @@ from src.config import config_dict
 @click.option("--port", type=int, default=None)
 def click_main(playbook, hosts, username, port):
     if username is None:
-        username = config_dict["username"]
+        username = config_dict.get("username")
     if port is None:
-        port = config_dict["port"]
+        port = config_dict.get("port", 22)
     playbook = file_parser.parse_playbook(playbook)
     hosts = file_parser.parse_hosts(hosts)
 
@@ -23,7 +27,10 @@ def click_main(playbook, hosts, username, port):
             for host in hosts[cmd["hosts"]]:
                 works_queue.append(executor.submit(host_controller.connect_and_execute_commands, host, cmd["tasks"], username, port))
         for work in as_completed(works_queue):
-            work.result()
+            try:
+                work.result()
+            except Exception as e:
+                logger.error(f"error on {host}: {e}")
     executor.shutdown(wait=True)
 
 def main():

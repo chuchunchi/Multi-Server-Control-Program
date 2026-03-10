@@ -1,9 +1,10 @@
-import paramiko
-from src.config import config_dict
 import logging
+
+import paramiko
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 def connect_to_host(host, username, port):
     ssh = paramiko.SSHClient()
@@ -11,11 +12,12 @@ def connect_to_host(host, username, port):
     ssh.set_missing_host_key_policy(paramiko.RejectPolicy())
     logger.info(f"Try to connect to {host} with username {username}, port {port}")
     try:
-        ssh.connect(host, port=port, username=username) # will get password from system
+        ssh.connect(host, port=port, username=username)  # will get password from system
     except Exception as e:
         logger.error(f"error connecting to {host}: {e}")
         return None
     return ssh
+
 
 def execute_command(ssh, command):
     _, stdout, stderr = ssh.exec_command(command)
@@ -26,6 +28,7 @@ def execute_command(ssh, command):
     if stderr != "":
         logger.error(" stderr: " + stderr)
     return
+
 
 def connect_and_execute_commands(host, commands, username, port):
     ssh = connect_to_host(host, username, port)

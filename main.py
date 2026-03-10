@@ -1,12 +1,14 @@
-from src import file_parser
-from src import host_controller
-from concurrent.futures import ThreadPoolExecutor, as_completed
-import click
-from src.config import config_dict
 import logging
+from concurrent.futures import ThreadPoolExecutor, as_completed
+
+import click
+
+from src import file_parser, host_controller
+from src.config import config_dict
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 @click.command()
 @click.option("--playbook", type=click.Path(exists=True), default="playbook.yaml")
@@ -25,16 +27,25 @@ def click_main(playbook, hosts, username, port):
         works_queue = []
         for cmd in playbook:
             for host in hosts[cmd["hosts"]]:
-                works_queue.append(executor.submit(host_controller.connect_and_execute_commands, host, cmd["tasks"], username, port))
+                future = executor.submit(
+                    host_controller.connect_and_execute_commands,
+                    host,
+                    cmd["tasks"],
+                    username,
+                    port
+                )
+                works_queue.append(future)
         for work in as_completed(works_queue):
             try:
                 work.result()
             except Exception as e:
-                logger.error(f"error on {host}: {e}")
+                logger.error(f"error: {e}")
     executor.shutdown(wait=True)
+
 
 def main():
     click_main()
+
 
 if __name__ == "__main__":
     main()
